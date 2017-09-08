@@ -1,2 +1,2 @@
 # HideAndSeek
-Play the classing hide and seek.
+Play the classic hide and seek game as either the hider or the seeker.
