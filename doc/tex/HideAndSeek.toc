@@ -1,0 +1,12 @@
+\contentsline {chapter}{\numberline {1}GDD \& TDD}{2}
+\contentsline {section}{\numberline {1.1}Summary}{2}
+\contentsline {section}{\numberline {1.2}Style \& Theme}{2}
+\contentsline {section}{\numberline {1.3}Story}{2}
+\contentsline {section}{\numberline {1.4}Collision Detection}{2}
+\contentsline {section}{\numberline {1.5}Game Features}{3}
+\contentsline {subsection}{\numberline {1.5.1}Core}{3}
+\contentsline {subsection}{\numberline {1.5.2}Additional}{3}
+\contentsline {subsection}{\numberline {1.5.3}Unlikely}{3}
+\contentsline {section}{\numberline {1.6}Artificial Intelligence}{3}
+\contentsline {subsection}{\numberline {1.6.1}Seeker Bot}{3}
+\contentsline {subsection}{\numberline {1.6.2}Hiding Bot}{4}

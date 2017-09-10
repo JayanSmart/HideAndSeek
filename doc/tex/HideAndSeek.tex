@@ -1,0 +1,54 @@
+\documentclass[]{report}
+
+
+% Title Page
+\title{What is Hidden can never Hide: Searching Pyke\\CSC2003S: GDD and TDD}
+\author{Jayan Smart\\SMRJAY001}
+
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\chapter{GDD \& TDD}
+
+\section{Summary}
+This is a basic top down hide and go seek style game. A full game will consist of a round-robin series of matches where every player takes a turn to seek, while the rest hide. The last player found will win the round, players are awarded points for the position in which they finish each round. At the end of the game, the player with the least total points will win the game. There is also the option of saving yourself by moving to the seeker's starting position. This allows a player to win the round by being the first safe player.
+
+\section{Style \& Theme}
+This game's theme is Game of Thrones inspired and would be based on children playing "hide and go seek" in Castle Pyke. The game would have a retro graphics style
+
+\section{Story}
+This game is not story orientated. Though the back story will be one of some children visiting their grandfather's mansion for the summer and playing hide and go seek.
+
+\section{Collision Detection}
+This game will have very simple collision detection as sprites will not be moving too fast. The crucial part of the collision detection is that if another player is within the "vision" of the seeker, they are visible to that player. A seeker must click on a visible hider for them to be found.
+
+\section{Game Features}
+The game features have been divided into three categories. Core are features that will influence the game play directly and be essential to enjoying the game. Additional, are all things that make the game nicer, without actually influencing game play.
+\subsection{Core}
+\begin{description}
+	\item[Vision] Vision will be the core mechanic of this game. Players will be able to "see" in a wide cone in front of their character. Anything not in this cone is hidden by a fog of war. If the seeker 'sees' another player, this player will be found. Vision will be restricted by walls and objects on the map.
+	\item[Sound] This game will include player footsteps and a visual representation of sound, visible to all players. This will be visible through obstructions such as walls.
+\end{description}
+\subsection{Additional}
+\begin{description}
+	\item[Main Menu] This game will have a main menu where the player can start a new game, change some settings from a settings menu (i.e. music or player name) or exit the game. 
+	\item[Multiple Maps] There will be different maps which will each represent a distinct floor of the mansion in which this game takes place.	
+	\item[Skins] This game will take on a Game of Thrones theme
+\end{description}
+\subsection{Unlikely}
+\begin{description}
+	\item[Multiplayer] This game will include an online multi player aspect where players can play against each other with or without bots. This will be over LAN networks only.
+\end{description}
+
+\section{Artificial Intelligence}
+This game will have 2 types of bot, a seeker and an hider.
+\subsection{Seeker Bot}
+The Seeker Bot will search the map for the player, by moving to "hiding places" which are pre given to the bot. This list of hiding spaces will be weighted and the more a player hides in one space, the more a bot will prioritize looking there. If the bot has searched the entire list of hiding places, it will be given a "clue", this will be the position of the centre of the room in which the player is hiding. It will then search around that position. If the player moves, the bot will be be given a new location. After a set time the bot will "give up" and any un-found players will tie for victory.
+
+\subsection{Hiding Bot}
+The Hiding Bot will use pre-defined hiding places to hide from the Seeker. Each bots list of spots will change depending on how well the hiding place performed in previous rounds.
+
+\end{document}
