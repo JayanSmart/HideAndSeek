@@ -3,7 +3,7 @@ package smrjay001.csc2003s.hideandseek.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import smrjay001.csc2003s.hideandseek.HideMain;
+import smrjay001.csc2003s.hideandseek.HSMain;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -14,6 +14,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new HideMain();
+                return new HSMain();
         }
 }
