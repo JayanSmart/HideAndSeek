@@ -14,29 +14,31 @@
 \chapter{GDD \& TDD}
 
 \section{Summary}
-This is a basic top down hide and go seek style game. A full game will consist of a round-robin series of matches where every player takes a turn to seek, while the rest hide. The last player found will win the round, players are awarded points for the position in which they finish each round. At the end of the game, the player with the least total points will win the game. There is also the option of saving yourself by moving to the seeker's starting position. This allows a player to win the round by being the first safe player.
+This is a basic top down hide and go seek style game. A full game will consist of a round-robin series of matches where every player takes a turn to seek, while the rest hide. The last player found will win the round, players are awarded points for the position in which they finish each round. At the end of the game, the player with the least total points will win the game. Each round will have a time limit and players are pressured into finding players fast because of this.
 
 \section{Style \& Theme}
-This game's theme is Game of Thrones inspired and would be based on children playing "hide and go seek" in Castle Pyke. The game would have a retro graphics style
+This game's theme is Game of Thrones inspired and would be based on children playing "hide and go seek" in Castle Pyke. The game would have a retro graphics style with pixelated art. Different maps would represent unique parts of the castle and the player(s) would "explore" the whole castle through a full game.
 
 \section{Story}
-This game is not story orientated. Though the back story will be one of some children visiting their grandfather's mansion for the summer and playing hide and go seek.
+This game is not story orientated, though it will loan on story elements from the Game of Thrones Universe.
 
 \section{Collision Detection}
-This game will have very simple collision detection as sprites will not be moving too fast. The crucial part of the collision detection is that if another player is within the "vision" of the seeker, they are visible to that player. A seeker must click on a visible hider for them to be found.
+This game will have very simple collision detection as sprites will not be moving too fast. The crucial part of the collision detection is that if another player is within the "vision" of the seeker, they are visible to that player. A seeker must click on a visible hider, while they have vision of them, for a player to be found.
 
 \section{Game Features}
-The game features have been divided into three categories. Core are features that will influence the game play directly and be essential to enjoying the game. Additional, are all things that make the game nicer, without actually influencing game play.
+The game features have been divided into three categories. Core are features that will influence the game play directly and be essential to enjoying the game. Additional, are all things that make the game nicer, without actually influencing game play. Unlikly features are things the game will be designed to eventually implement, but due to time constraints, these may not be possible.
 \subsection{Core}
 \begin{description}
 	\item[Vision] Vision will be the core mechanic of this game. Players will be able to "see" in a wide cone in front of their character. Anything not in this cone is hidden by a fog of war. If the seeker 'sees' another player, this player will be found. Vision will be restricted by walls and objects on the map.
 	\item[Sound] This game will include player footsteps and a visual representation of sound, visible to all players. This will be visible through obstructions such as walls.
+	\item[Time] Each round will have a time limit and because of this, finding players fast will be a key part to winning this game. This mechanic is something that can be configured by the player when creating a new game. Time is far more of an aspect for the hiders who receive the best score for not being found. Therefore static hiding is not a winning strategy as one should always be found eventually if one remains in a single location.
 \end{description}
 \subsection{Additional}
 \begin{description}
+	\item[Score] Each game will have many rounds. Players earn points in each round and this will decide the overall winner at the end of the game. The Seeker will earn one point for every player they find, as well as an extra point if they find all the players. Hiders will earn 0 if they are found first and one point is added for every player found before them. They will receive maximum points + 1, if they go un-found in a round.
 	\item[Main Menu] This game will have a main menu where the player can start a new game, change some settings from a settings menu (i.e. music or player name) or exit the game. 
 	\item[Multiple Maps] There will be different maps which will each represent a distinct floor of the mansion in which this game takes place.	
-	\item[Skins] This game will take on a Game of Thrones theme
+	\item[Skins] This game will take on a Game of Thrones theme and players can change skins during a round by clicking specific "hidden" items on the map. 
 \end{description}
 \subsection{Unlikely}
 \begin{description}
@@ -46,9 +48,8 @@ The game features have been divided into three categories. Core are features tha
 \section{Artificial Intelligence}
 This game will have 2 types of bot, a seeker and an hider.
 \subsection{Seeker Bot}
-The Seeker Bot will search the map for the player, by moving to "hiding places" which are pre given to the bot. This list of hiding spaces will be weighted and the more a player hides in one space, the more a bot will prioritize looking there. If the bot has searched the entire list of hiding places, it will be given a "clue", this will be the position of the centre of the room in which the player is hiding. It will then search around that position. If the player moves, the bot will be be given a new location. After a set time the bot will "give up" and any un-found players will tie for victory.
+The Seeker Bot will search the map for the player, by moving to "hiding places" which are pre given to the bot using a heat map. This list of hiding spaces will be weighted and the more a player hides in one space, the more a bot will prioritize looking there. If the bot has searched the entire list of "probable" hiding places, it will be given a "clue", this will be the position near to where a player is hiding. It will then search around that position. If the player moves, the bot will be be given a new location. After a set time the bot will "give up" and any un-found players will tie for victory.
 
 \subsection{Hiding Bot}
-The Hiding Bot will use pre-defined hiding places to hide from the Seeker. Each bots list of spots will change depending on how well the hiding place performed in previous rounds.
-
+The Hiding Bot will use pre-defined hiding places to hide from the Seeker. Each bots list of spots will change depending on how well the hiding place performed in previous rounds. Should a player search an area and a Bot hear them leave, then the bot may try move into that searched area in an attempt to find a safer hiding spot.
 \end{document}

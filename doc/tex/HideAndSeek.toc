@@ -6,7 +6,7 @@
 \contentsline {section}{\numberline {1.5}Game Features}{3}
 \contentsline {subsection}{\numberline {1.5.1}Core}{3}
 \contentsline {subsection}{\numberline {1.5.2}Additional}{3}
-\contentsline {subsection}{\numberline {1.5.3}Unlikely}{3}
-\contentsline {section}{\numberline {1.6}Artificial Intelligence}{3}
-\contentsline {subsection}{\numberline {1.6.1}Seeker Bot}{3}
+\contentsline {subsection}{\numberline {1.5.3}Unlikely}{4}
+\contentsline {section}{\numberline {1.6}Artificial Intelligence}{4}
+\contentsline {subsection}{\numberline {1.6.1}Seeker Bot}{4}
 \contentsline {subsection}{\numberline {1.6.2}Hiding Bot}{4}
