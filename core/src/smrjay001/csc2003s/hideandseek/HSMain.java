@@ -13,6 +13,7 @@ public class HSMain extends Game {
 	private ApplicationScreen applicationScreen;
 	private Menu menuScreen;
 	private EndScreen endScreen;
+	public GameAssetManager assMan = new GameAssetManager();
 
 	public final static int MENU = 0;
 	public final static int SETTINGS = 1;
@@ -46,12 +47,11 @@ public class HSMain extends Game {
 
 	/**
 	 * This manages the switching from one screen in the Game.
-	 * @param screen Screen Alias passed as an int. Aliases are stored as satic final ints, for ease of readability.
+	 * @param screen Screen Alias passed as an int. Aliases are stored as static final ints, for ease of readability.
 	 */
 	public void changeScreen(int screen) {
 		switch (screen) {
 			case MENU:
-				System.out.println("To menu");
 				if(menuScreen == null) menuScreen = new Menu(this);
 				this.setScreen(menuScreen);
 				break;
@@ -72,6 +72,9 @@ public class HSMain extends Game {
 	
 	@Override
 	public void dispose () {
-
+		loadingScreen.dispose();
+		configScreen.dispose();
+		applicationScreen.dispose();
+		super.dispose();
 	}
 }
