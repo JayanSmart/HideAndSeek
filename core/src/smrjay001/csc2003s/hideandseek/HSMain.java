@@ -1,6 +1,7 @@
 package smrjay001.csc2003s.hideandseek;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.GL30;
 import smrjay001.csc2003s.hideandseek.screens.*;
 
 import com.badlogic.gdx.Gdx;
@@ -40,7 +41,7 @@ public class HSMain extends Game {
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(0, 0, 0, 0);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 		this.screen.render(1);
 	}
 
