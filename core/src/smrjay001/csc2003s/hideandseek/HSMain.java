@@ -67,7 +67,7 @@ public class HSMain extends Game {
 				this.setScreen(configScreen);
 				break;
 			case APPLICATION:
-				if(applicationScreen == null) applicationScreen = new ApplicationScreen(this);
+				applicationScreen = new ApplicationScreen(this);
 				checking = true;
 				debug = false;
 				this.setScreen(applicationScreen);
@@ -79,7 +79,7 @@ public class HSMain extends Game {
 				this.setScreen(endScreen);
 				break;
 			case CHECKING:
-				if(applicationScreen == null) applicationScreen = new ApplicationScreen(this);
+				applicationScreen = new ApplicationScreen(this);
 				checking = true;
 				debug = true;
 				this.setScreen(applicationScreen);
