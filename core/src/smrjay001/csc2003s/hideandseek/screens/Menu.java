@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import smrjay001.csc2003s.hideandseek.HSMain;
 
 import static smrjay001.csc2003s.hideandseek.HSMain.APPLICATION;
+import static smrjay001.csc2003s.hideandseek.HSMain.CHECKING;
 import static smrjay001.csc2003s.hideandseek.HSMain.SETTINGS;
 
 
@@ -42,7 +43,7 @@ public class Menu implements Screen {
 
 		//create buttons
 		TextButton newGameButton = new TextButton("New Game", skin);
-		TextButton settingsButton = new TextButton("Settings", skin);
+		TextButton newCheckingGameButton = new TextButton("New Game with Debug", skin);
 		TextButton exitButton = new TextButton("Exit", skin);
 
 		//Create Heading
@@ -55,7 +56,7 @@ public class Menu implements Screen {
 		//add buttons to table
 		table.add(newGameButton).fillX().uniformX();
 		table.row();
-		table.add(settingsButton).fillX().uniformX();
+		table.add(newCheckingGameButton).fillX().uniformX();
 		table.row().pad(10, 0, 10, 0);
 		table.add(exitButton).fillX().uniformX();
 
@@ -76,11 +77,11 @@ public class Menu implements Screen {
 			}
 		});
 
-		settingsButton.addListener(new ChangeListener() {
+		newCheckingGameButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				stage.clear();
-				parent.changeScreen(SETTINGS);
+				parent.changeScreen(CHECKING);
 			}
 		});
 	}

@@ -1,31 +1,33 @@
 package smrjay001.csc2003s.hideandseek;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ScreenUtils;
+import smrjay001.csc2003s.hideandseek.screens.ApplicationScreen;
 
 public class Player extends Sprite {
 
-	Vector2 velocity;
-	Vector2 destination;
+	private Vector2 velocity;
+	private Vector2 destination;
 
-	private float speed = 0.1f;
+	ApplicationScreen parent;
 
-	TiledMapTileLayer collisionLayer;
+	boolean bitChecking;
 
-	public Player(Texture texture, TiledMapTileLayer collisionLayer) {
+	private TiledMapTileLayer collisionLayer;
+
+	public Player(ApplicationScreen parent, Texture texture, TiledMapTileLayer collisionLayer, boolean bitChecking) {
 		super(texture);
+		this.parent = parent;
 		this.collisionLayer = collisionLayer;
+		this.bitChecking = bitChecking;
 		velocity = new Vector2().setZero();
-		destination = new Vector2(32, 32);
+		destination = new Vector2(0, 0);
 	}
 
 	public void draw(SpriteBatch spriteBatch) {
@@ -42,14 +44,21 @@ public class Player extends Sprite {
 		destination = new Vector2(x, y);
 	}
 
+	public Vector2 getDestination() {
+		return destination;
+	}
+
 	private void update(float delta) {
 
+		//For testing
 //		printCollisionLayer();
 
 		float oldX = getX(), oldY = getY();
 		Boolean collisionX;
 		boolean collisionY;
 		float tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileWidth();
+
+		float speed = 0.7f;
 
 		Vector2 difference = new Vector2(destination.x - getX(), destination.y - getY());
 		if (Math.abs(getX() - destination.x) > 1 || (Math.abs(getY() - destination.y) > 1)) {
@@ -72,8 +81,11 @@ public class Player extends Sprite {
 		}
 
 		if (collisionX) {
-			System.out.println("CollisionX");
 			setX(oldX);
+		} else {
+			parent.camera.translate(velocity.x, 0);
+			parent.camera.update();
+
 		}
 
 		//move on Y
@@ -88,17 +100,22 @@ public class Player extends Sprite {
 		}
 
 		if (collisionY) {
-			System.out.println("CollisionY");
 			setY(oldY);
+		} else {
+			parent.camera.translate(0, velocity.y);
+			parent.camera.update();
 		}
 	}
 
 
 	/**
-	 * The bit checking for collision detection
+	 * The bit checking for collision detection.
 	 * @return true if there is collision, else false.
 	 */
 	private boolean bitcheck(int mapX, int mapY) {
+
+		if (!bitChecking) return true;
+
 		boolean collision = false;
 		getTexture().getTextureData().prepare();
 		Pixmap pixPlay = getTexture().getTextureData().consumePixmap();
@@ -110,10 +127,11 @@ public class Player extends Sprite {
 					for (int y = ((mapY*32) - ((int) getY())); y < (int) getHeight(); y++) {
 						if (pixPlay.getPixel(x,y) > 0) {
 							collision = true;
+							System.out.println("Pixel Color: "+pixPlay.getPixel(x,y));
+							break;
 						}
 					}
 				}
-
 				return collision;
 			} else {
 				//Case 2
@@ -121,10 +139,11 @@ public class Player extends Sprite {
 					for (int y = 0; y < (mapY + 1) * 32 - ((int) getY()); y++) {
 						if (pixPlay.getPixel(x,y) > 0) {
 							collision = true;
+							System.out.println("Pixel Color: "+pixPlay.getPixel(x,y));
+							break;
 						}
 					}
 				}
-
 				return collision;
 			}
 		} else {
@@ -133,8 +152,9 @@ public class Player extends Sprite {
 				for (int x = 0; x < ((mapX+1)*32) - ((int) getX()); x++) {
 					for (int y = ((mapY*32) - ((int) getY())); y < (int) getHeight(); y++) {
 						if (pixPlay.getPixel(x,y) > 0) {
-							System.out.println(pixPlay.getPixel(x,y));
 							collision = true;
+							System.out.println("Pixel Color: "+pixPlay.getPixel(x,y));
+							break;
 						}
 					}
 				}
@@ -145,6 +165,8 @@ public class Player extends Sprite {
 					for (int y = 0; y < (mapY + 1) * 32 - ((int) getY()); y++) {
 						if (pixPlay.getPixel(x,y) > 0) {
 							collision = true;
+							System.out.println("Pixel Color: "+pixPlay.getPixel(x,y));
+							break;
 						}
 					}
 				}
@@ -158,21 +180,21 @@ public class Player extends Sprite {
 	 * This method is for testing. It prints a text interpretation of the game board to the map.
 	 */
 	private void printCollisionLayer() {
-		String out = "";
+		StringBuilder out = new StringBuilder();
 		int playerX = (int) Math.floor(getX()/32), playerY = (int) Math.floor(getY()/32);
 		int destX = (int) Math.floor(destination.x/32), destY = (int) Math.floor(destination.y)/32;
 
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10; y++) {
 				if (x == playerX && y == playerY) {
-					out += "XXX, ";
+					out.append("XXX, ");
 				} else if (x==destX && y == destY) {
-					out += "DDD, ";
+					out.append("DDD, ");
 				}else {
-					out += collisionLayer.getCell(x, y).getTile().getId() + ", ";
+					out.append(collisionLayer.getCell(x, y).getTile().getId()).append(", ");
 				}
 			}
-			out +="\n";
+			out.append("\n");
 		}
 		System.out.println(out);
 	}
@@ -186,36 +208,41 @@ public class Player extends Sprite {
 	private boolean isTileBlocked(float x, float y) {
 		TiledMapTileLayer.Cell cell = collisionLayer.getCell((int)(x / collisionLayer.getTileWidth()),(int)(y / collisionLayer.getTileHeight()));
 		if (cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked")) {
+			if (bitChecking) {
+				System.out.println("Bitchecking!");
+			} else {
+				System.out.println("Tile Collisions!");
+			}
 			return bitcheck((int)(x / collisionLayer.getTileWidth()),(int)(y / collisionLayer.getTileHeight()));
 		} else {
 			return false;
 		}
 	}
 
-	boolean collidesRight(){
-		for (float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 5) {
+	private boolean collidesRight(){
+		for (float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2) {
 			if (isTileBlocked(getX() + 32, getY()+step)) return true;
 		}
 		return false;
 	}
 
-	boolean collidesLeft() {
-		for (float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 5) {
+	private boolean collidesLeft() {
+		for (float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2) {
 			if (isTileBlocked(getX(), getY()+step)) return true;
 		}
 		return false;
 	}
 
-	boolean collidesTop() {
-		for (float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 5) {
+	private boolean collidesTop() {
+		for (float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2) {
 			if (isTileBlocked(getX() + step, getY()+32)) return true;
 		}
 		return false;
 	}
 
-	boolean collidesBottom() {
+	private boolean collidesBottom() {
 
-		for (float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 5) {
+		for (float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2) {
 			if (isTileBlocked(getX() + step, getY())) return true;
 		}
 		return false;

@@ -16,10 +16,13 @@ public class HSMain extends Game {
 	private EndScreen endScreen;
 	public GameAssetManager assMan = new GameAssetManager();
 
+	public boolean checking, debug;
+
 	public final static int MENU = 0;
 	public final static int SETTINGS = 1;
 	public final static int APPLICATION = 2;
 	public final static int ENDGAME = 3;
+	public final static int CHECKING = 4;
 
 	
 	@Override
@@ -34,7 +37,6 @@ public class HSMain extends Game {
 		configScreen = new ConfigScreen(this);
 		applicationScreen = new ApplicationScreen(this);
 
-		System.out.println("Change");
 		changeScreen(MENU);
 	}
 
@@ -54,21 +56,39 @@ public class HSMain extends Game {
 		switch (screen) {
 			case MENU:
 				if(menuScreen == null) menuScreen = new Menu(this);
+				checking = false;
+				debug = false;
 				this.setScreen(menuScreen);
 				break;
 			case SETTINGS:
 				if(configScreen == null) configScreen = new ConfigScreen(this);
+				checking = false;
+				debug = false;
 				this.setScreen(configScreen);
 				break;
 			case APPLICATION:
 				if(applicationScreen == null) applicationScreen = new ApplicationScreen(this);
+				checking = true;
+				debug = false;
 				this.setScreen(applicationScreen);
 				break;
 			case ENDGAME:
 				if(endScreen == null) endScreen = new EndScreen(this);
+				checking = false;
+				debug = false;
 				this.setScreen(endScreen);
 				break;
+			case CHECKING:
+				if(applicationScreen == null) applicationScreen = new ApplicationScreen(this);
+				checking = true;
+				debug = true;
+				this.setScreen(applicationScreen);
+				break;
 		}
+	}
+
+	public void swapChecking() {
+		checking = !checking;
 	}
 	
 	@Override
