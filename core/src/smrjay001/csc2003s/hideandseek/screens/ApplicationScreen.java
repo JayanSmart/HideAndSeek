@@ -4,7 +4,6 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -18,7 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import smrjay001.csc2003s.hideandseek.Collectible;
 import smrjay001.csc2003s.hideandseek.HSMain;
 import smrjay001.csc2003s.hideandseek.Player;
-import smrjay001.csc2003s.hideandseek.util.AIMangaer;
+import smrjay001.csc2003s.hideandseek.util.AIManager;
 import smrjay001.csc2003s.hideandseek.util.ClockwiseComparator;
 
 import java.util.ArrayList;
@@ -38,14 +37,14 @@ public class ApplicationScreen implements Screen, InputProcessor {
 
 	private BitmapFont font;
 
-	public ArrayList<Collectible> collectables;
+	public ArrayList<Collectible> collectibles;
 
-	ShapeRenderer shapeRenderer, destinationRenderer, botRenderer;
+	private ShapeRenderer shapeRenderer, destinationRenderer, botRenderer;
 
 	private Boolean game_over, debugging;
 
 	private Player player;
-	private AIMangaer bot;
+	private ArrayList<AIManager> bots;
 	private TiledMap tiledMap;
 	private TiledMapTileLayer collisionLayer;
 	public OrthographicCamera camera;
@@ -69,6 +68,8 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		destinationRenderer = new ShapeRenderer();
 		botRenderer = new ShapeRenderer();
 
+		random = new Random();
+
 		float width = Gdx.graphics.getWidth();
 		float height = Gdx.graphics.getHeight();
 
@@ -91,25 +92,38 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		batch = new SpriteBatch();
 
 		player = new Player(this, this.parent.assMan.assetManager.get("assets/characters/player1.png"),
-				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				parent.checking);
+				(TiledMapTileLayer) tiledMap.getLayers().get(0));
 		player.setX(5*32);
 		player.setY(8*32);
 		player.setDestination(5*32, 8*32);
 
-		bot = new AIMangaer(this, this.parent.assMan.assetManager.get("assets/characters/player2.png"),
+		bots = new ArrayList<AIManager>(0);
+		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player2.png"),
+						(TiledMapTileLayer) tiledMap.getLayers().get(0),
+						getRandomSpawnPoint()
+		));
+		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player3.png"),
 				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				parent.checking);
-		bot.setX(6*32);
-		bot.setY(8*32);
-		bot.setDestination(6*32, 8*32);
+				 getRandomSpawnPoint()
+		));
+		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player4.png"),
+				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+				 getRandomSpawnPoint()
+		));
+		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player5.png"),
+				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+				 getRandomSpawnPoint()
+		));
+		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player6.png"),
+				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+				getRandomSpawnPoint()
+		));
 
 		game_over = false;
 
 		font = new BitmapFont();
 		font.setColor(Color.GOLDENROD);
 
-		random = new Random();
 
 		corners = new Vector2[] {
 				new Vector2(19*32,19*32), 	//0
@@ -165,19 +179,19 @@ public class ApplicationScreen implements Screen, InputProcessor {
 				{corners[20], corners[12]},	//23
 		};
 
-		collectables = new ArrayList<Collectible>();
+		collectibles = new ArrayList<>();
 
 		//Handle Game Events
 
-		while (collectables.size() < 10) {
-			Vector2 position = getItemSpawn();
-			collectables.add(new Collectible(this, this.parent.assMan.assetManager.get("assets/items/BlueCoin.png"),position.x, position.y));
+		while (collectibles.size() < 10) {
+			Vector2 position = getRandomSpawnPoint();
+			collectibles.add(new Collectible(this, this.parent.assMan.assetManager.get("assets/items/BlueCoin.png"),position.x, position.y));
 		}
 	}
 
 	@Override
 	public void render (float delta) {
-		if (collectables.size() == 0) {
+		if (collectibles.size() == 0) {
 			game_over = true;
 		}
 
@@ -193,7 +207,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 				parent.changeScreen(MENU);
 			}
 			Vector3 finalFont = camera.unproject(new Vector3(camera.viewportWidth/2, camera.viewportHeight/2, 0));
-			font.draw(batch, "GAME OVER!\nPlayer: "+player.getScore()+"\nBot:    "+bot.getScore()+"\n\nPress ESC to return to the main menu", finalFont.x, finalFont.y);
+			font.draw(batch, "GAME OVER!\nPlayer: "+player.getScore()+"\nBot:    "+bots.get(1).getScore()+"\n\nPress ESC to return to the main menu", finalFont.x, finalFont.y);
 			batch.end();
 		} else {
 			float[] player_vision_points;
@@ -225,7 +239,10 @@ public class ApplicationScreen implements Screen, InputProcessor {
 			poly.polygon(player_vision_points);
 			poly.end();
 
-			bot.think();
+			for (AIManager bot :
+					bots){
+				bot.think();
+			}
 
 			if (debugging) {
 				for (int i = 0; i < player_vision_points.length; i+=2) {
@@ -235,14 +252,14 @@ public class ApplicationScreen implements Screen, InputProcessor {
 				shapeRenderer.rect(player.getBoundingRectangle().x, player.getBoundingRectangle().y, player.getBoundingRectangle().width, player.getBoundingRectangle().height);
 
 				for (Collectible item :
-						collectables) {
+						collectibles) {
 					shapeRenderer.rect(item.getBoundingRectangle().x, item.getBoundingRectangle().y, item.getBoundingRectangle().width, item.getBoundingRectangle().height);
 				}
 
 				botRenderer.setProjectionMatrix(camera.combined);
 				botRenderer.setColor(Color.ORANGE);
 				botRenderer.begin(ShapeRenderer.ShapeType.Line);
-				botRenderer.polygon(bot.getVisionPolygon());
+				botRenderer.polygon(bots.get(0).getVisionPolygon());
 				botRenderer.end();
 
 			}
@@ -256,7 +273,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 			//Draw Items
 			Vector2[] player_poly_vision = new Vector2[player_vision_points.length/2];
 			for (Collectible item :
-					collectables) {
+					collectibles) {
 				Rectangle boundingBox = item.getBoundingRectangle();
 				for (int i = 0; i < player_vision_points.length / 2; i++) {
 					player_poly_vision[i] = new Vector2(player_vision_points[2*i], player_vision_points[2*i+1]);
@@ -265,18 +282,21 @@ public class ApplicationScreen implements Screen, InputProcessor {
 					item.draw(batch);
 				}
 			}
-			if (Intersector.isPointInPolygon(new Array<>(player_poly_vision), new Vector2(bot.getX() +16, bot.getY() + 16))) {
-				bot.draw(batch);
+			for (AIManager bot :
+					bots) {
+				if (Intersector.isPointInPolygon(new Array<>(player_poly_vision), new Vector2(bot.getX() +16, bot.getY() + 16))) {
+					bot.draw(batch);
+				}
 			}
 			player.draw(batch);
 			Vector3 text = camera.unproject(new Vector3(32, 32, 0));
 			font.draw(batch, "Player Score: "+player.getScore(), text.x, text.y);
-			font.draw(batch, "Bot Score:    "+bot.getScore(), text.x, text.y-32);
+			font.draw(batch, "Bot Score:    "+bots.get(0).getScore(), text.x, text.y-32);
 			batch.end();
 		}
 	}
 
-	private Vector2 getItemSpawn() {
+	private Vector2 getRandomSpawnPoint() {
 		Boolean valid = false;
 		Vector2 position = new Vector2();
 		int x,y;
@@ -314,8 +334,10 @@ public class ApplicationScreen implements Screen, InputProcessor {
 
 	@Override
 	public void dispose () {
-		batch.dispose();
-		font.dispose();
+		if (batch != null) {
+			batch.dispose();
+			font.dispose();
+		}
 	}
 
 	@Override
@@ -396,11 +418,10 @@ public class ApplicationScreen implements Screen, InputProcessor {
 	 */
 	private Vector2 rotateRelativeVector2(Vector2 pin, Vector2 point, double angle) {
 
-		Vector2 out =  new Vector2(
+		return new Vector2(
 				(float) (((point.x - pin.x) * Math.cos(angle) - (point.y - pin.y) * Math.sin(angle)) + pin.x),
-				(float) (((point.x - pin.x) * Math.sin(angle) + (point.y - pin.y) * Math.cos(angle)) + pin.y)
+				(float) (((point.x - pin.x) * Math.sin(angle) + ((point.y - pin.y) * Math.cos(angle))) + pin.y)
 		);
-		return out;
 	}
 
 	/**
@@ -411,11 +432,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 	 */
 	private boolean isTileBlocked(float x, float y) {
 		TiledMapTileLayer.Cell cell = collisionLayer.getCell((int)(x / collisionLayer.getTileWidth()),(int)(y / collisionLayer.getTileHeight()));
-		if (cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked")) {
-			return true;
-		} else {
-			return false;
-		}
+		return cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked");
 	}
 
 	public float[] getVision(Vector2 posn) {
@@ -431,24 +448,24 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		Vector2 offset;
 		for (int i = 0; i<corners.length; i++) {
 			offset = rotateRelativeVector2(posn, corners[i], 0.0001).setLength(1000);
-			for (int j = 0; j < lines.length; j++) {
-				if (Intersector.intersectSegments(posn, offset, lines[j][0], lines[j][1], intersection)) {
-					if (intersection.dst(posn) < vision_points[3*i].dst(posn)) {
+			for (Vector2[] line : lines) {
+				if (Intersector.intersectSegments(posn, offset, line[0], line[1], intersection)) {
+					if (intersection.dst(posn) < vision_points[3 * i].dst(posn)) {
 						vision_points[3 * i] = new Vector2(intersection.x, intersection.y);
 					}
 				}
 			}
-			for (int k = 0; k < lines.length; k++) {
-				if (Intersector.intersectSegments(posn, corners[i], lines[k][0], lines[k][1], intersection)) {
-					if (intersection.dst(posn) < vision_points[(3*i)+1].dst(posn)) {
-						vision_points[(3*i)+1] = new Vector2(intersection.x, intersection.y);
+			for (Vector2[] line : lines) {
+				if (Intersector.intersectSegments(posn, corners[i], line[0], line[1], intersection)) {
+					if (intersection.dst(posn) < vision_points[(3 * i) + 1].dst(posn)) {
+						vision_points[(3 * i) + 1] = new Vector2(intersection.x, intersection.y);
 					}
 				}
 			}
 			offset = rotateRelativeVector2(posn, corners[i], -0.0001).setLength(1000);
-			for (int l = 0; l < lines.length; l++) {
-				if (Intersector.intersectSegments(posn, offset, lines[l][0], lines[l][1], intersection)) {
-					if (intersection.dst(posn) < vision_points[(3*i)+2].dst(posn)) {
+			for (Vector2[] line : lines) {
+				if (Intersector.intersectSegments(posn, offset, line[0], line[1], intersection)) {
+					if (intersection.dst(posn) < vision_points[(3 * i) + 2].dst(posn)) {
 						vision_points[(3 * i) + 2] = new Vector2(intersection.x, intersection.y);
 					}
 				}

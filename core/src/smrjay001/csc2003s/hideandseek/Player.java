@@ -2,13 +2,11 @@ package smrjay001.csc2003s.hideandseek;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import smrjay001.csc2003s.hideandseek.screens.ApplicationScreen;
 
@@ -28,11 +26,11 @@ public class Player extends Sprite {
 
 	private Sound sound;
 
-	public Player(ApplicationScreen parent, Texture texture, TiledMapTileLayer collisionLayer, boolean bitChecking) {
+	public Player(ApplicationScreen parent, Texture texture, TiledMapTileLayer collisionLayer) {
 		super(texture);
 		this.parent = parent;
 		this.collisionLayer = collisionLayer;
-		this.bitChecking = bitChecking;
+		this.bitChecking = true;
 		velocity = new Vector2().setZero();
 		destination = new Vector2(0, 0);
 		score = 0;
@@ -269,13 +267,13 @@ public class Player extends Sprite {
 	}
 
 	public void pickUpItem() {
-		ArrayList<Collectible> copy = (ArrayList<Collectible>) parent.collectables.clone();
+		ArrayList<Collectible> copy = (ArrayList<Collectible>) parent.collectibles.clone();
 		for (Collectible item :
 				copy) {
 			System.out.println(this.getX()+" : "+getY());
 			System.out.println(item.getX()+" : "+getY());
 			if (this.getBoundingRectangle().overlaps(item.getBoundingRectangle())) {
-				parent.collectables.remove(item);
+				parent.collectibles.remove(item);
 				score += 1;
 				sound.play(1.0f);
 			}

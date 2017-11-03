@@ -1,5 +1,6 @@
 package smrjay001.csc2003s.hideandseek.util;
 
+import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -13,19 +14,32 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-public class AIMangaer extends Player {
+public class AIManager extends Player {
 
 	ArrayList<Collectible> visibleItems;
+
+
 
 	Random random;
 	private int score;
 	float[] vision;
 
-	public AIMangaer(ApplicationScreen parent, Texture texture, TiledMapTileLayer collisionLayer, boolean bitChecking) {
-		super(parent, texture, collisionLayer, bitChecking);
+	/**
+	 * @param parent The Application
+	 * @param texture The Displayed Image
+	 * @param collisionLayer MapMetaData
+	 * @param position The initial position of the Bot
+	 */
+	public AIManager(ApplicationScreen parent, Texture texture, TiledMapTileLayer collisionLayer, Vector2 position) {
+		super(parent, texture, collisionLayer);
 		visibleItems = new ArrayList<>(0);
 		random = new Random();
+		setX(position.x);
+		setY(position.y);
+		setDestination(position.x, position.y);
 		score = 0;
+
+		
 	}
 
 	@Override
@@ -116,7 +130,7 @@ public class AIMangaer extends Player {
 
 		//look for Items in vision
 		for (Collectible item :
-				parent.collectables) {
+				parent.collectibles) {
 			Rectangle boundingBox = item.getBoundingRectangle();
 			Vector2[] player_poly_vision = new Vector2[vision.length/2];
 			for (int i = 0; i < vision.length / 2; i++) {
@@ -135,7 +149,7 @@ public class AIMangaer extends Player {
 			} else if (x > 640) {
 				x -= 640;
 			}
-			float y = destination.y+(random.nextInt(64)-32)*random.nextInt(4);
+			float y = destination.y + (random.nextInt(64)-32)*random.nextInt(4);
 			if (y<0) {
 				y = -y;
 			} else if (y > 640) {
@@ -143,24 +157,30 @@ public class AIMangaer extends Player {
 			}
 			super.setDestination(x, y);
 		} else {
-			//Got to pick up closest item
-			float dist = 1000; //some impossible value;
+			//Go to pick up closest item
+			float dist = Integer.MAX_VALUE;
 
 			for (Collectible item :
 					new ArrayList<>((Collection<Collectible>) visibleItems.clone())) {
 				if (this.getBoundingRectangle().overlaps(item.getBoundingRectangle())) {
-					parent.collectables.remove(item);
+					parent.collectibles.remove(item);
 					visibleItems.remove(item);
 					this.addScore(1);
 					System.out.println("Bot Scores!");
 					break;
 				} else {
 					if (getDestination().dst(new Vector2(item.getX()+16, item.getY()+16)) < dist) {
-						setDestination(item.getX() + 16, item.getY() + 16);
+						dist = getDestination().dst(new Vector2(item.getX()+16, item.getY()+16));
+						setPathToo(item.getX() + 16, item.getY() + 16);
 					}
 				}
 			}
 		}
+	}
+
+	private void setPathToo(float x, float y) {
+
+
 	}
 
 	public float[] getVisionPolygon() {
