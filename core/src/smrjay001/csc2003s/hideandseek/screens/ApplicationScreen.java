@@ -39,9 +39,9 @@ public class ApplicationScreen implements Screen, InputProcessor {
 
 	public ArrayList<Collectible> collectibles;
 
-	private ShapeRenderer shapeRenderer, destinationRenderer, botRenderer;
+	public ShapeRenderer shapeRenderer, destinationRenderer, botRenderer;
 
-	private Boolean game_over, debugging;
+	public Boolean game_over, debugging;
 
 	private Player player;
 	private ArrayList<AIManager> bots;
@@ -61,6 +61,12 @@ public class ApplicationScreen implements Screen, InputProcessor {
 
 	@Override
 	public void show() {
+
+		//Render Graphics
+		Gdx.graphics.setWindowedMode(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+		Gdx.graphics.setResizable(true);
+		Gdx.gl.glClearColor(1, 1, 1, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		debugging = parent.debug;
 
@@ -93,31 +99,31 @@ public class ApplicationScreen implements Screen, InputProcessor {
 
 		player = new Player(this, this.parent.assMan.assetManager.get("assets/characters/player1.png"),
 				(TiledMapTileLayer) tiledMap.getLayers().get(0));
-		player.setX(5*32);
-		player.setY(8*32);
-		player.setDestination(5*32, 8*32);
+		player.setX(Gdx.graphics.getWidth()/2);
+		player.setY(Gdx.graphics.getHeight()/2+32);
+		player.setDestination(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2+32);
 
 		bots = new ArrayList<AIManager>(0);
 		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player2.png"),
 						(TiledMapTileLayer) tiledMap.getLayers().get(0),
-						getRandomSpawnPoint()
+						getRandomOpenPoint()
 		));
-		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player3.png"),
-				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				 getRandomSpawnPoint()
-		));
-		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player4.png"),
-				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				 getRandomSpawnPoint()
-		));
-		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player5.png"),
-				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				 getRandomSpawnPoint()
-		));
-		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player6.png"),
-				(TiledMapTileLayer) tiledMap.getLayers().get(0),
-				getRandomSpawnPoint()
-		));
+//		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player3.png"),
+//				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+//				 getRandomOpenPoint()
+//		));
+//		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player4.png"),
+//				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+//				 getRandomOpenPoint()
+//		));
+//		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player5.png"),
+//				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+//				 getRandomOpenPoint()
+//		));
+//		bots.add(new AIManager(this, this.parent.assMan.assetManager.get("assets/characters/player6.png"),
+//				(TiledMapTileLayer) tiledMap.getLayers().get(0),
+//				getRandomOpenPoint()
+//		));
 
 		game_over = false;
 
@@ -184,7 +190,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		//Handle Game Events
 
 		while (collectibles.size() < 10) {
-			Vector2 position = getRandomSpawnPoint();
+			Vector2 position = getRandomOpenPoint();
 			collectibles.add(new Collectible(this, this.parent.assMan.assetManager.get("assets/items/BlueCoin.png"),position.x, position.y));
 		}
 	}
@@ -195,19 +201,17 @@ public class ApplicationScreen implements Screen, InputProcessor {
 			game_over = true;
 		}
 
-		//Render Graphics
-		Gdx.graphics.setWindowedMode(1200,800);
-		Gdx.graphics.setResizable(true);
-		Gdx.gl.glClearColor(1, 1, 1, 0);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		if (game_over) {
 			batch.begin();
 			if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 				parent.changeScreen(MENU);
 			}
 			Vector3 finalFont = camera.unproject(new Vector3(camera.viewportWidth/2, camera.viewportHeight/2, 0));
-			font.draw(batch, "GAME OVER!\nPlayer: "+player.getScore()+"\nBot:    "+bots.get(1).getScore()+"\n\nPress ESC to return to the main menu", finalFont.x, finalFont.y);
+			String out = "GAME OVER!\nPlayer: "+player.getScore();
+			for (int i = 0; i < bots.size(); i++) {
+				out += "\nBot "+(i+1)+":    "+bots.get(i).getScore();
+			}
+			font.draw(batch, out+"\n\nPress ESC to return to the main menu", finalFont.x, finalFont.y);
 			batch.end();
 		} else {
 			float[] player_vision_points;
@@ -296,14 +300,15 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		}
 	}
 
-	private Vector2 getRandomSpawnPoint() {
+	public Vector2 getRandomOpenPoint() {
 		Boolean valid = false;
 		Vector2 position = new Vector2();
 		int x,y;
 		while (!valid) {
 			x = random.nextInt(19)*32;
 			y = random.nextInt(19)*32;
-			System.out.println("x : y => "+x+" : "+y);
+			if (debugging)
+				System.out.println("x : y => "+x+" : "+y);
 			if (!isTileBlocked(x,y)) {
 				valid = true;
 			}
@@ -385,7 +390,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		Vector3 clickCoordinates = new Vector3(screenX-32,screenY+32,0);
 		Vector3 position = camera.unproject(clickCoordinates);
-		player.setDestination(position.x, position.y);
+		player.setDestination(position.x+16, position.y+16);
 		return true;
 	}
 
@@ -430,14 +435,18 @@ public class ApplicationScreen implements Screen, InputProcessor {
 	 * @param y the y position on the Tiled Map
 	 * @return true if the Tile contains the "blocked" property, else false.
 	 */
-	private boolean isTileBlocked(float x, float y) {
-		TiledMapTileLayer.Cell cell = collisionLayer.getCell((int)(x / collisionLayer.getTileWidth()),(int)(y / collisionLayer.getTileHeight()));
-		return cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked");
+	public boolean isTileBlocked(float x, float y) {
+		try {
+			TiledMapTileLayer.Cell cell = collisionLayer.getCell((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
+			return cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked");
+		} catch (NullPointerException e) {
+			//If the tile does not exist (off map) treat it as a blocked cell.
+			return true;
+		}
 	}
 
 	public float[] getVision(Vector2 posn) {
 		//Calculate Vision Polygon
-
 		Vector2[] vision_points = new Vector2[corners.length*3];
 		for (int i = 0; i < vision_points.length; i++) {
 			vision_points[i] = new Vector2(1000,1000);
@@ -447,7 +456,7 @@ public class ApplicationScreen implements Screen, InputProcessor {
 		intersection = new Vector2(10000, 10000); //Bigger then anything possible in game
 		Vector2 offset;
 		for (int i = 0; i<corners.length; i++) {
-			offset = rotateRelativeVector2(posn, corners[i], 0.0001).setLength(1000);
+			offset = rotateRelativeVector2(posn, corners[i], 0.001).setLength(1000);
 			for (Vector2[] line : lines) {
 				if (Intersector.intersectSegments(posn, offset, line[0], line[1], intersection)) {
 					if (intersection.dst(posn) < vision_points[3 * i].dst(posn)) {

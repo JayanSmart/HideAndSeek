@@ -67,14 +67,7 @@ public class Player extends Sprite {
 
 		float speed = 0.7f;
 
-		Vector2 difference = new Vector2(destination.x - getX(), destination.y - getY());
-		if (Math.abs(getX() - destination.x) > 1 || (Math.abs(getY() - destination.y) > 1)) {
-			difference.nor();
-			velocity = new Vector2(difference.x * speed, difference.y * speed);
-		} else {
-			velocity = new Vector2().setZero();
-			setPosition(destination.x, destination.y);
-		}
+		checkArrived(speed);
 
 		//move on X
 		if (Math.abs(getX() - destination.x) > 1) {
@@ -90,7 +83,7 @@ public class Player extends Sprite {
 		if (collisionX) {
 			setX(oldX);
 		} else {
-			parent.camera.translate(velocity.x, 0);
+//			parent.camera.translate(velocity.x, 0);
 			parent.camera.update();
 
 		}
@@ -109,8 +102,21 @@ public class Player extends Sprite {
 		if (collisionY) {
 			setY(oldY);
 		} else {
-			parent.camera.translate(0, velocity.y);
+//			parent.camera.translate(0, velocity.y);
 			parent.camera.update();
+		}
+	}
+
+	protected boolean checkArrived(float speed) {
+		Vector2 difference = new Vector2(destination.x - getX(), destination.y - getY());
+		if (Math.abs(getX() - destination.x) > 1 || (Math.abs(getY() - destination.y) > 1)) {
+			difference.nor();
+			velocity = new Vector2(difference.x * speed, difference.y * speed);
+			return false;
+		} else {
+			velocity = new Vector2().setZero();
+			setPosition(destination.x, destination.y);
+			return true;
 		}
 	}
 
@@ -135,7 +141,6 @@ public class Player extends Sprite {
 					for (int y = ((mapY * 32) - ((int) getY())); y < (int) getHeight(); y++) {
 						if (pixPlay.getPixel(x, y) > 0) {
 							collision = true;
-							System.out.println("Pixel Color: " + pixPlay.getPixel(x, y));
 							break;
 						}
 					}
@@ -147,7 +152,6 @@ public class Player extends Sprite {
 					for (int y = 0; y < (mapY + 1) * 32 - ((int) getY()); y++) {
 						if (pixPlay.getPixel(x, y) > 0) {
 							collision = true;
-							System.out.println("Pixel Color: " + pixPlay.getPixel(x, y));
 							break;
 						}
 					}
@@ -161,7 +165,6 @@ public class Player extends Sprite {
 					for (int y = ((mapY * 32) - ((int) getY())); y < (int) getHeight(); y++) {
 						if (pixPlay.getPixel(x, y) > 0) {
 							collision = true;
-							System.out.println("Pixel Color: " + pixPlay.getPixel(x, y));
 							break;
 						}
 					}
@@ -173,7 +176,6 @@ public class Player extends Sprite {
 					for (int y = 0; y < (mapY + 1) * 32 - ((int) getY()); y++) {
 						if (pixPlay.getPixel(x, y) > 0) {
 							collision = true;
-							System.out.println("Pixel Color: " + pixPlay.getPixel(x, y));
 							break;
 						}
 					}
@@ -217,11 +219,6 @@ public class Player extends Sprite {
 	private boolean isTileBlocked(float x, float y) {
 		TiledMapTileLayer.Cell cell = collisionLayer.getCell((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
 		if (cell.getTile() != null && cell.getTile().getProperties().containsKey("blocked")) {
-			if (bitChecking) {
-				System.out.println("Bitchecking!");
-			} else {
-				System.out.println("Tile Collisions!");
-			}
 			return bitcheck((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
 		} else {
 			return false;
@@ -270,8 +267,6 @@ public class Player extends Sprite {
 		ArrayList<Collectible> copy = (ArrayList<Collectible>) parent.collectibles.clone();
 		for (Collectible item :
 				copy) {
-			System.out.println(this.getX()+" : "+getY());
-			System.out.println(item.getX()+" : "+getY());
 			if (this.getBoundingRectangle().overlaps(item.getBoundingRectangle())) {
 				parent.collectibles.remove(item);
 				score += 1;
