@@ -14,4 +14,8 @@ public class Collectible extends Sprite {
 		this.parent = parent;
 		setPosition(x, y);
 	}
+
+	public Vector2 getPosition() {
+		return new Vector2(getX(), getY());
+	}
 }
